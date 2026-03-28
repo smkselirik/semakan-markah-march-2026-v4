@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semakan Markah Peperiksaan - SMK Selirik, Kapit</title>
+    <style>
+        /* Gaya Asas & Latar Belakang */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header Profesional & Dinamik */
+        header {
+            background-color: #151B54; /* Night Blue */
+            /* Corak abstrak korporat */
+            background-image: linear-gradient(30deg, #1b236a 12%, transparent 12.5%, transparent 87%, #1b236a 87.5%, #1b236a), 
+                              linear-gradient(150deg, #1b236a 12%, transparent 12.5%, transparent 87%, #1b236a 87.5%, #1b236a), 
+                              linear-gradient(30deg, #1b236a 12%, transparent 12.5%, transparent 87%, #1b236a 87.5%, #1b236a), 
+                              linear-gradient(150deg, #1b236a 12%, transparent 12.5%, transparent 87%, #1b236a 87.5%, #1b236a), 
+                              linear-gradient(60deg, #1f2878 25%, transparent 25.5%, transparent 75%, #1f2878 75%, #1f2878), 
+                              linear-gradient(60deg, #1f2878 25%, transparent 25.5%, transparent 75%, #1f2878 75%, #1f2878);
+            background-size: 40px 70px;
+            background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        header img {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+        
+        header h2 {
+            margin: 5px 0 0 0;
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: #d1d8ff;
+        }
+
+        /* Bekas Utama */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        /* Borang Carian */
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            color: #151B54;
+        }
+
+        select, input[type="text"] {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: #151B54;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #151B54;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #1e2882;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Paparan Keputusan */
+        #result-area {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .student-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 5px solid #151B54;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .student-info p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #151B54;
+            color: white;
+        }
+
+        .summary-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background-color: #eef2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            font-size: 0.95rem;
+        }
+
+        .summary-item span {
+            font-weight: bold;
+            color: #151B54;
+        }
+
+        /* Notifikasi */
+        #loading, #error {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        #loading { color: #151B54; }
+        #error { color: #dc3545; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: auto;
+        }
+
+        /* Cetakan Slip (Print) */
+        .print-header { display: none; }
+        .print-btn {
+            background-color: #28a745;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .print-btn:hover { background-color: #218838; }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+            body {
+                background: white;
+                color: black;
+            }
+            header, .search-box, .print-btn, footer, #loading, #error {
+                display: none !important;
+            }
+            .container {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                max-width: 100%;
+            }
+            #result-area {
+                display: block;
+                margin-top: 0;
+            }
+            .print-header {
+                display: block;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .print-header img {
+                width: 100%;
+                height: auto;
+            }
+            table th {
+                background-color: #eee !important;
+                color: black !important;
+            }
+            th, td { padding: 8px; font-size: 12px; }
+            .student-info p, .summary-item { font-size: 12px; }
+            .student-info { border-left-color: #000; padding: 10px; }
+            .summary-box { background-color: white; border: 1px solid #ddd; padding: 10px; }
+        }
+
+        @media (min-width: 600px) {
+            .search-box {
+                flex-direction: row;
+                align-items: flex-end;
+            }
+            .input-group { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://i.ibb.co/VYSKMXf1/Logo-Selirik.png" alt="Logo SMK Selirik">
+        <h1>SMK SELIRIK, KAPIT</h1>
+        <h2>Portal Semakan Peperiksaan Pertengahan 1 (Mac) 2026</h2>
+    </header>
+
+    <div class="container">
+        <div class="search-box">
+            <div class="input-group">
+                <label for="tingkatan">Tingkatan</label>
+                <select id="tingkatan">
+                    <option value="1">Tingkatan 1</option>
+                    <option value="2">Tingkatan 2</option>
+                    <option value="3">Tingkatan 3</option>
+                    <option value="4">Tingkatan 4</option>
+                    <option value="5">Tingkatan 5</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="ic_number">No. Kad Pengenalan</label>
+                <input type="text" id="ic_number" placeholder="Contoh: 090101131234" autocomplete="off">
+            </div>
+            <button onclick="semakMarkah()">Semak Keputusan</button>
+        </div>
+
+        <div id="loading">Sila tunggu, sedang mendapatkan data...</div>
+        <div id="error"></div>
+
+        <div id="result-area">
+            <div class="print-header">
+                <img src="https://i.ibb.co/670hn3CB/smk-selirik.png" alt="Header Cetakan SMK Selirik">
+            </div>
+
+            <div class="student-info">
+                <p><strong>Nama:</strong> <span id="res-nama"></span></p>
+                <p><strong>No KP:</strong> <span id="res-kp"></span></p>
+                <p><strong>Kelas:</strong> <span id="res-kelas"></span></p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subjek</th>
+                        <th>Markah</th>
+                        <th>Gred</th>
+                    </tr>
+                </thead>
+                <tbody id="res-subjects">
+                    </tbody>
+            </table>
+
+            <div class="summary-box" id="res-summary">
+                </div>
+
+            <button class="print-btn" onclick="window.print()">Cetak / Simpan PDF</button>
+        </div>
+    </div>
+
+    <footer>
+        Hakcipta terpelihara &copy; NDJE@Selirik, Kapit 2026
+    </footer>
+
+    <script>
+        // Pautan CSV Data
+        const urls = {
+            "1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vS9ngcL37KMX8ZDsGKomo7Lv6yowNqFdcWciJuvS1UkUU6aFHI_VKuFDLP1d0fKtMlXTW8APMYD38xZ/pub?gid=1419213935&single=true&output=csv",
+            "2": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSD6QwXil_0_gA0OBb2t82FneuCt68Sp7P9-He4zyBPEoaVHkJent8hiCSFPa33F-AEmR9BgeEogpt-/pub?gid=1419213935&single=true&output=csv",
+            "3": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQg40cTCNS7MVyZVA3-8sZkbNtVT_Db9abxz6xhv1ccZ5ZksWIy0qyn8y30lqxG9G9YN1TOMBXF7WCY/pub?gid=1419213935&single=true&output=csv",
+            "4": "https://docs.google.com/spreadsheets/d/e/2PACX-1vR831uDWcPfxf9zOj-mekolv_DMkdsYRMdVsxoLcKqwL88z-tetvP57ti5wB5M2dYIXYVZf9eX7R6Q8/pub?gid=1615224868&single=true&output=csv",
+            "5": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRq9lzeK5sombRvA2WRgEYGygUdZwEfifZHVy4IMZiRD7c-yll60qkA4pXeBBocqJsRV6GpM1uazU_B/pub?gid=1615224868&single=true&output=csv"
+        };
+
+        // Fungsi Tukar Nama Kolum (A, B, C...) kepada Index Array (0, 1, 2...)
+        function colToIndex(col) {
+            let index = 0;
+            for (let i = 0; i < col.length; i++) {
+                index = index * 26 + (col.charCodeAt(i) - 64);
+            }
+            return index - 1;
+        }
+
+        // Pemetaan Lajur bagi Tingkatan 1, 2, 3
+        const mapMenengahRendah = {
+            subjects: [
+                { name: "BAHASA MELAYU", mark: "E", grade: "F" },
+                { name: "ENGLISH LANGUAGE", mark: "G", grade: "H" },
+                { name: "MATEMATIK", mark: "I", grade: "J" },
+                { name: "SEJARAH", mark: "K", grade: "L" },
+                { name: "SAINS", mark: "M", grade: "N" },
+                { name: "GEOGRAFI", mark: "O", grade: "P" },
+                { name: "BAHASA IBAN", mark: "Q", grade: "R" },
+                { name: "PENDIDIKAN MORAL", mark: "S", grade: "T" },
+                { name: "PENDIDIKAN ISLAM", mark: "U", grade: "V" },
+                { name: "REKA BENTUK & TEKNOLOGI", mark: "W", grade: "X" },
+                { name: "ASAS SAINS KOMPUTER", mark: "Y", grade: "Z" },
+                { name: "PENDIDIKAN SENI VISUAL", mark: "AA", grade: "AB" },
+                { name: "PENDIDIKAN JASMANI & PENDIDIKAN KESIHATAN", mark: "AO", grade: "AP" }
+            ],
+            summary: [
+                { label: "Jumlah Markah", col: "BC" },
+                { label: "Purata Markah", col: "BD" },
+                { label: "Gred Purata (GP)", col: "BE" },
+                { label: "Analisis", col: "BH" },
+                { label: "Keputusan", col: "BK" },
+                { label: "Kedudukan Dalam Kelas", col: "BG" },
+                { label: "Kedudukan Dalam Tingkatan", col: "BR" },
+                { label: "Ulasan Guru Kelas", col: "BI" }
+            ]
+        };
+
+        // Pemetaan Lajur bagi Tingkatan 4, 5
+        const mapMenengahAtas = {
+            subjects: [
+                { name: "BAHASA MELAYU", mark: "E", grade: "F" },
+                { name: "SEJARAH", mark: "G", grade: "H" },
+                { name: "ENGLISH LANGUAGE", mark: "I", grade: "J" },
+                { name: "MATEMATIK / MATHEMATICS", mark: "K", grade: "L" },
+                { name: "PENDIDIKAN MORAL", mark: "M", grade: "N" },
+                { name: "PENDIDIKAN ISLAM", mark: "O", grade: "P" },
+                { name: "SAINS", mark: "Q", grade: "R" },
+                { name: "PENDIDIKAN SENI VISUAL", mark: "S", grade: "T" },
+                { name: "BAHASA IBAN", mark: "U", grade: "V" },
+                { name: "REKA CIPTA", mark: "W", grade: "X" },
+                { name: "PENGAJIAN PERNIAGAAN", mark: "Y", grade: "Z" },
+                { name: "PHYSICS", mark: "AA", grade: "AB" },
+                { name: "CHEMISTRY", mark: "AC", grade: "AD" },
+                { name: "BIOLOGY", mark: "AE", grade: "AF" },
+                { name: "ADDITIONAL MATHEMATICS", mark: "AG", grade: "AH" },
+                { name: "SAINS KOMPUTER", mark: "AI", grade: "AJ" },
+                { name: "KIMPALAN ARKA & GAS", mark: "AK", grade: "AL" },
+                { name: "PENDIDIKAN JASMANI & PENDIDIKAN KESIHATAN", mark: "BK", grade: "BL" }
+            ],
+            summary: [
+                { label: "Jumlah Markah", col: "CA" },
+                { label: "Purata Markah", col: "CB" },
+                { label: "Gred Purata (GP)", col: "CC" },
+                { label: "Purata Nilai Gred (PNG)", col: "CD" },
+                { label: "Analisis", col: "CG" },
+                { label: "Keputusan", col: "CE" },
+                { label: "Kedudukan Dalam Kelas", col: "CF" },
+                { label: "Kedudukan Dalam Tingkatan", col: "CX" },
+                { label: "Ulasan Guru Kelas", col: "CW" }
+            ]
+        };
+
+        // Fungsi Parsing CSV (menguruskan koma di dalam teks jika ada)
+        function parseCSV(text) {
+            let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
+            for (l of text) {
+                if ('"' === l) {
+                    if (s && l === p) row[i] += l;
+                    s = !s;
+                } else if (',' === l && s) l = row[++i] = '';
+                else if ('\n' === l && s) {
+                    if ('\r' === p) row[i] = row[i].slice(0, -1);
+                    row = ret[++r] = [l = '']; i = 0;
+                } else row[i] += l;
+                p = l;
+            }
+            return ret;
+        }
+
+        async function semakMarkah() {
+            const tk = document.getElementById('tingkatan').value;
+            const kp = document.getElementById('ic_number').value.trim();
+            const url = urls[tk];
+
+            const resultArea = document.getElementById('result-area');
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error');
+
+            resultArea.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            if (!kp) {
+                errorDiv.innerText = "Sila masukkan No. Kad Pengenalan anda.";
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const data = parseCSV(text);
+
+                // Index asas: B = No KP (1), C = Nama (2), D = Kelas (3)
+                const indexKP = colToIndex("B");
+                const indexNama = colToIndex("C");
+                const indexKelas = colToIndex("D");
+
+                let studentData = null;
+
+                // Cari rekod pelajar
+                for (let i = 1; i < data.length; i++) {
+                    const row = data[i];
+                    if (row.length > indexKP && row[indexKP].toString().trim() === kp) {
+                        studentData = row;
+                        break;
+                    }
+                }
+
+                if (!studentData) {
+                    errorDiv.innerText = "Maaf, rekod tidak dijumpai. Sila pastikan No. Kad Pengenalan dan Tingkatan adalah betul.";
+                    errorDiv.style.display = 'block';
+                    loading.style.display = 'none';
+                    return;
+                }
+
+                // Masukkan Info Asas
+                document.getElementById('res-nama').innerText = studentData[indexNama];
+                document.getElementById('res-kp').innerText = studentData[indexKP];
+                document.getElementById('res-kelas').innerText = studentData[indexKelas];
+
+                // Pilih Map yang betul
+                const mapData = (tk === "4" || tk === "5") ? mapMenengahAtas : mapMenengahRendah;
+
+                // Proses Subjek
+                const tbody = document.getElementById('res-subjects');
+                tbody.innerHTML = "";
+                
+                mapData.subjects.forEach(sub => {
+                    const idxMark = colToIndex(sub.mark);
+                    const idxGrade = colToIndex(sub.grade);
+                    
+                    const mark = (studentData[idxMark] || "").trim();
+                    const grade = (studentData[idxGrade] || "").trim();
+
+                    // Jangan papar jika markah tiada atau 'NULL'
+                    if (mark !== "" && mark.toUpperCase() !== "NULL" && mark !== "-") {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${sub.name}</td>
+                            <td>${mark}</td>
+                            <td>${grade}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+
+                // Proses Rumusan
+                const summaryBox = document.getElementById('res-summary');
+                summaryBox.innerHTML = "";
+
+                mapData.summary.forEach(sum => {
+                    const idxSum = colToIndex(sum.col);
+                    const val = (studentData[idxSum] || "").trim();
+
+                    const div = document.createElement('div');
+                    div.className = "summary-item";
+                    div.innerHTML = `<span>${sum.label}:</span> ${val !== "" ? val : "-"}`;
+                    summaryBox.appendChild(div);
+                });
+
+                loading.style.display = 'none';
+                resultArea.style.display = 'block';
+
+            } catch (err) {
+                loading.style.display = 'none';
+                errorDiv.innerText = "Terdapat ralat ketika mengambil data. Sila semak sambungan internet anda atau cuba sebentar lagi.";
+                errorDiv.style.display = 'block';
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
